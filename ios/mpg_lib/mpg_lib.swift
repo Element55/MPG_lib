@@ -37,7 +37,7 @@ class mpg_lib: RCTEventEmitter {
             alpha: CGFloat(1.0)
         )
     }
-    @objc func showNotification(_ title: String, subtitle: String?, hexBackgroundColor: String?, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
+    @objc func showNotification(_ key: String, title: String, subtitle: String?, hexBackgroundColor: String?, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
         let s = subtitle ?? "";
         var bgColor:UIColor;
@@ -58,8 +58,16 @@ class mpg_lib: RCTEventEmitter {
                 notification.duration = d;
                 notification.backgroundTapsEnabled = true;
                 notification.animationType = .linear;
-                notification.show();
-                success(["Notification should be showing up"]);
+                notification.show(buttonHandler: { (mpgnotification, buttonIndex) in
+                    let body = [
+                        "key": key,
+                        "buttonIndex": buttonIndex
+                        ] as [String : Any];
+                    self.sendEvent(withName: "on_notification_tap", body: body)
+                })
+                notification.dismissHandler = { (mpgNotification) in
+                    success(["rnswift_template_native"]);
+                }
             } else {
                 reject(nil,nil,nil);
             }
@@ -74,7 +82,7 @@ class mpg_lib: RCTEventEmitter {
     }
     //Note that any event name used in sendEvent above needs to be in this array.
     override func supportedEvents() -> [String]! {
-        return ["mpg_lib"]
+        return ["mpg_lib", "on_notification_tap"]
     }
     //Demonstrate setting constants. Note that constants can be (almost) any type, but that this function is only evaluated once, at initialidation
     @objc override func constantsToExport() -> Dictionary<AnyHashable, Any> {
