@@ -3,11 +3,7 @@ import Foundation
 //Also, any method exposed to objective-c runtime will also require the hint.
 //import MPGNotification
 @objc(mpg_lib)
-//{
-//    title:
-//    message:,
-//
-//}
+
 class mpg_lib: RCTEventEmitter {
     //Demonstrate a basic promise-based function in swift
     @objc func demo(_ message:String, success: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -19,26 +15,48 @@ class mpg_lib: RCTEventEmitter {
             success(["demo message: " + message]);
         }
     }
-    @objc func showNotification(_
-        title: String,
-        subtitle: String?,
-        color: UIColor?,
-        duration: NSNumber?,
-        backgroundTapEnabled: NSNumber?,
-        success: @escaping RCTPromiseResolveBlock,
-        reject: @escaping RCTPromiseRejectBlock
+    //https://stackoverflow.com/questions/24263007/how-to-use-hex-colour-values
+    func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+        
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+        
+        var rgbValue:UInt32 = 0
+        Scanner(string: cString).scanHexInt32(&rgbValue)
+        
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+    @objc func showNotification(_ title: String, subtitle: String?, hexBackgroundColor: String?, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
         let s = subtitle ?? "";
-        let c = color ?? UIColor.blue;
-        let d = duration ?? 3;
-        var bgTapEnabled = true;
-        if let num = backgroundTapEnabled {
-            bgTapEnabled = num != 0 ? true : false;
+        var bgColor:UIColor;
+        if let c = hexBackgroundColor {
+            bgColor = self.hexStringToUIColor(hex: c);
+        } else {
+            bgColor = UIColor.blue;
         }
+        var d: TimeInterval = 3;
+//        if let _ = duration {
+//            d = TimeInterval(duration!)
+//        } else {
+//            d = 3;
+//        }
+
         DispatchQueue.main.async {
-            if let notification = MPGNotification(title: title, subtitle: s, backgroundColor: c, iconImage: nil) {
-                notification.duration = TimeInterval(d);
-                notification.backgroundTapsEnabled = bgTapEnabled;
+            if let notification = MPGNotification(title: title, subtitle: s, backgroundColor:bgColor, iconImage: nil) {
+                notification.duration = d;
+                notification.backgroundTapsEnabled = true;
                 notification.animationType = .linear;
                 notification.show();
                 success(["Notification should be showing up"]);
