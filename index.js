@@ -45,6 +45,7 @@ const showNotification = async (title, subtitle = "", color = "#0000FF", onTap) 
     onTap
   });
   showPendingNotifications();
+  return key;
 };
 const showPendingNotifications = async () => {
   if (!pendingNotifications.length) return;
