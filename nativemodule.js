@@ -24,6 +24,11 @@ const mpg_lib = {
     //Returns a promise!
     const output = await mpg_lib_native.demo(message);
     return output;
+  },
+  showNotification: async () => {
+    const output = await mpg_lib_native.showNotification();
+    console.warn(output);
+    return output;
   }
 };
 

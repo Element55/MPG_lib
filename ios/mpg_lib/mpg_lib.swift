@@ -3,6 +3,11 @@ import Foundation
 //Also, any method exposed to objective-c runtime will also require the hint.
 //import MPGNotification
 @objc(mpg_lib)
+//{
+//    title:
+//    message:,
+//
+//}
 class mpg_lib: RCTEventEmitter {
     //Demonstrate a basic promise-based function in swift
     @objc func demo(_ message:String, success: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -14,17 +19,32 @@ class mpg_lib: RCTEventEmitter {
             success(["demo message: " + message]);
         }
     }
-    @objc func showNotification(_ success: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    @objc func showNotification(_
+        title: String,
+        subtitle: String?,
+        color: UIColor?,
+        duration: NSNumber?,
+        backgroundTapEnabled: NSNumber?,
+        success: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
+    ) -> Void {
+        let s = subtitle ?? "";
+        let c = color ?? UIColor.blue;
+        let d = duration ?? 3;
+        var bgTapEnabled = true;
+        if let num = backgroundTapEnabled {
+            bgTapEnabled = num != 0 ? true : false;
+        }
         DispatchQueue.main.async {
-            if let notification = MPGNotification(title: "Test", subtitle: "Test", backgroundColor: UIColor.blue, iconImage: nil) {
-                notification.duration = 3;
-                notification.backgroundTapsEnabled = true;
+            if let notification = MPGNotification(title: title, subtitle: s, backgroundColor: c, iconImage: nil) {
+                notification.duration = TimeInterval(d);
+                notification.backgroundTapsEnabled = bgTapEnabled;
                 notification.animationType = .linear;
                 notification.show();
                 success(["Notification should be showing up"]);
-                return;
+            } else {
+                reject(nil,nil,nil);
             }
-            reject(["Failed to make notification"]);
         }
     }
     //Demonstrate using the event emitter
