@@ -2,32 +2,18 @@ import { NativeModules, NativeEventEmitter } from "react-native";
 const mpg_lib_native = NativeModules.mpg_lib;
 
 const mpg_lib = {
-  nativeObj: mpg_lib_native,
-  a: mpg_lib_native.a,
-  b: mpg_lib_native.b,
-  startTime: mpg_lib_native.startTime,
-  addListener: cb => {
-    const e = new NativeEventEmitter(mpg_lib_native);
-    const s = e.addListener("mpg_lib", cb);
-    return s;
+  showErrorNotification: async (title, subtitle) => {
+    mpg_lib.showNotification(title, subtitle, "#FF0000");
   },
-  addListenerDemo: () => {
-    mpg_lib.addListener(arr => {
-      console.log("Received a mpg_lib event", arr.message);
-    });
+  showSuccessNotification: async (title, subtitle) => {
+    mpg_lib.showNotification(title, subtitle, "#00FF00");
   },
-  emitMessage: async (message, delayms) => {
-    if (!delayms) delayms = 0;
-    return await mpg_lib_native.delayedSend(message, delayms);
-  },
-  demoWithPromise: async message => {
-    //Returns a promise!
-    const output = await mpg_lib_native.demo(message);
-    return output;
-  },
-  showNotification: async () => {
-    const output = await mpg_lib_native.showNotification();
-    console.warn(output);
+  showNotification: async (title, subtitle = "", color = "#0000FF") => {
+    const output = await mpg_lib_native.showNotification(
+      title,
+      subtitle,
+      color
+    );
     return output;
   }
 };
