@@ -15,5 +15,10 @@
   "devDependencies": {
     "react-native-pod": "^1.10.0",
     "react-native-swift-bridge": "^2.1.0"
+  },
+  "pods": {
+    "MPGNotification": {
+      "pod": "MPGNotification"
+    }
   }
 }
