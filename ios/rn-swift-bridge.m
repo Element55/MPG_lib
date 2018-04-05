@@ -3,7 +3,7 @@
 #import <React/RCTBridgeModule.h>
 @interface RCT_EXTERN_MODULE(mpg_lib, RCTEventEmitter)
 RCT_EXTERN_METHOD(demo:(NSString *)message success:(RCTPromiseResolveBlock)success reject:(RCTPromiseRejectBlock)reject);
-RCT_EXTERN_METHOD(showNotification:(RCTPromiseResolveBlock)success reject:(RCTPromiseRejectBlock)reject);
+RCT_EXTERN_METHOD(showNotification:(NSString *)title subtitle:(NSString *)subtitle hexBackgroundColor:(NSString *)hexBackgroundColor success:(RCTPromiseResolveBlock)success reject:(RCTPromiseRejectBlock)reject);
 RCT_EXTERN_METHOD(delayedSend:(NSString *)message ms:(NSInteger)ms);
 @end
 @interface RCT_EXTERN_MODULE(mpg_libBasicViewManager, RCTViewManager)
