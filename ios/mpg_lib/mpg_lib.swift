@@ -3,18 +3,7 @@ import Foundation
 //Also, any method exposed to objective-c runtime will also require the hint.
 //import MPGNotification
 @objc(mpg_lib)
-
 class mpg_lib: RCTEventEmitter {
-    //Demonstrate a basic promise-based function in swift
-    @objc func demo(_ message:String, success: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-        if(message.count == 0) {
-            print("I did not receive a message");
-            reject(nil, nil, nil);
-        } else {
-            print("I received a message of " + message);
-            success(["demo message: " + message]);
-        }
-    }
     //https://stackoverflow.com/questions/24263007/how-to-use-hex-colour-values
     func hexStringToUIColor (hex:String) -> UIColor {
         var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
