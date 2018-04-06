@@ -39,36 +39,55 @@ e.addListener("on_notification_tap", d => {
 e.addListener("on_notification_dismiss", d => {
   try {
     const { key } = d;
-    console.log("on_notification_dmiss: fired for>", d);
     const n = findNotificationByKey(key);
 
     if (n && n.options && typeof n.options.onDismiss == "function") {
-      console.log("on_notification_dmiss: fire dismiss callback");
-
       n.options.onDismiss();
-    } else {
-      console.log("on_notification_dmiss: cant fire dismiss callback>", n);
     }
   } catch (error) {
     console.warn(error.message);
   }
 });
+const whiteInHex = "#FFFFFF";
+const blackInHex = "#000000";
 const defaultOptions = Object.freeze({
   duration: 3,
-  backgroundColor: "#000000",
+  backgroundColor: blackInHex,
+  titleColor: whiteInHex,
+  subtitleColor: whiteInHex,
+  allowTapDismissal: true,
   onTap: null,
   onDismiss: null
 });
-const showNotification = async (title, subtitle = "", options) => {
-  const key = makeGuid();
-  if (typeof options !== "object") {
+const cleanOptions = options => {
+  if (!options) return {};
+  if (typeof options !== "object" || Array.isArray(options)) {
     console.warn(
-      "showNotification: third argument must be an object. Valid keys: ",
+      "mpg_lib: Notification options must be an object. Valid keys: ",
       JSON.stringify(Object.keys(defaultOptions))
     );
-    options = {};
+    return {};
   }
-  options = Object.assign({}, defaultOptions, options);
+  const invalidKeys = [];
+  const clean = {};
+  Object.keys(options).forEach(key => {
+    if (typeof defaultOptions[key] === "undefined") {
+      invalidKeys.push(key);
+    } else {
+      clean[key] = options[key];
+    }
+  });
+  if (invalidKeys.length) {
+    console.warn(
+      "mpg_lib: Notification options are invalid: ",
+      JSON.stringify(invalidKeys)
+    );
+  }
+  return clean;
+};
+const showNotification = async (title, subtitle = "", options) => {
+  const key = makeGuid();
+  options = Object.assign({}, defaultOptions, cleanOptions(options));
   pendingNotifications.push({
     key,
     title,
@@ -85,13 +104,22 @@ const showPendingNotifications = async () => {
   if (isNotificationActive) return;
   isNotificationActive = true;
   const { key, title, subtitle, options } = thisNotification;
-  const { duration, backgroundColor } = options;
+  const {
+    duration,
+    backgroundColor,
+    titleColor,
+    subtitleColor,
+    allowTapDismissal
+  } = options;
   const output = await mpg_lib_native.showNotification(
     key,
     title,
     subtitle,
     backgroundColor,
-    duration
+    duration,
+    titleColor,
+    subtitleColor,
+    allowTapDismissal
   );
   isNotificationActive = false;
   pendingNotifications.shift();
