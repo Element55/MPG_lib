@@ -3,6 +3,7 @@ import Foundation
 //Also, any method exposed to objective-c runtime will also require the hint.
 //import MPGNotification
 @objc(mpg_lib)
+
 class mpg_lib: RCTEventEmitter {
     //https://stackoverflow.com/questions/24263007/how-to-use-hex-colour-values
     func hexStringToUIColor (hex:String) -> UIColor {
@@ -26,25 +27,17 @@ class mpg_lib: RCTEventEmitter {
             alpha: CGFloat(1.0)
         )
     }
-    @objc func showNotification(_ key: String, title: String, subtitle: String?, hexBackgroundColor: String?, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
+    @objc func showNotification(_ key: String, title: String, subtitle: String,  hexBackgroundColor: String, duration: Double, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
-        let s = subtitle ?? "";
-        var bgColor:UIColor;
-        if let c = hexBackgroundColor {
-            bgColor = self.hexStringToUIColor(hex: c);
-        } else {
-            bgColor = UIColor.blue;
-        }
-        var d: TimeInterval = 3;
-//        if let _ = duration {
-//            d = TimeInterval(duration!)
-//        } else {
-//            d = 3;
-//        }
+        
+        let backgroundColor:UIColor = self.hexStringToUIColor(hex: hexBackgroundColor);
+        
+        
+
 
         DispatchQueue.main.async {
-            if let notification = MPGNotification(title: title, subtitle: s, backgroundColor:bgColor, iconImage: nil) {
-                notification.duration = d;
+            if let notification = MPGNotification(title: title, subtitle: subtitle, backgroundColor:backgroundColor, iconImage: nil) {
+                notification.duration = duration;
                 notification.backgroundTapsEnabled = true;
                 notification.animationType = .linear;
                 notification.show(buttonHandler: { (mpgnotification, buttonIndex) in
@@ -55,7 +48,7 @@ class mpg_lib: RCTEventEmitter {
                     self.sendEvent(withName: "on_notification_tap", body: body)
                 })
                 notification.dismissHandler = { (mpgNotification) in
-                    success(["rnswift_template_native"]);
+                    success(["notification_dismissed"]);
                 }
             } else {
                 reject(nil,nil,nil);
