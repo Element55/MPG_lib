@@ -44,7 +44,10 @@ class mpg_lib: RCTEventEmitter {
                     self.sendEvent(withName: "on_notification_tap", body: body)
                 })
                 notification.dismissHandler = { (mpgNotification) in
-                    success(["notification_dismissed"]);
+                    self.sendEvent(withName: "on_notification_dismiss", body: [
+                        "key": key,
+                        ])
+                    success(["notification finished"]);
                 }
             } else {
                 reject("failed_notification_instantiation","Failed to create MPGNotification object",nil);
@@ -60,7 +63,7 @@ class mpg_lib: RCTEventEmitter {
     }
     //Note that any event name used in sendEvent above needs to be in this array.
     override func supportedEvents() -> [String]! {
-        return ["mpg_lib", "on_notification_tap"]
+        return ["mpg_lib", "on_notification_tap", "on_notification_dismiss"]
     }
     //Demonstrate setting constants. Note that constants can be (almost) any type, but that this function is only evaluated once, at initialidation
     @objc override func constantsToExport() -> Dictionary<AnyHashable, Any> {

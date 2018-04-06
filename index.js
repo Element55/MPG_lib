@@ -16,36 +16,59 @@ const makeGuid = (pieces, delimiter, prepend) => {
   }
   return prepend + hashes.join(delimiter);
 };
-
-const e = new NativeEventEmitter(mpg_lib_native);
-const s = e.addListener("on_notification_tap", d => {
-  const { key } = d;
+const findNotificationByKey = key => {
   const n = pendingNotifications.find(n => {
     if (n.key === key) return true;
     return false;
   });
-  if (n && typeof n.onTap == "function") {
-    n.onTap();
+  return n;
+};
+
+const e = new NativeEventEmitter(mpg_lib_native);
+e.addListener("on_notification_tap", d => {
+  try {
+    const { key } = d;
+    const n = findNotificationByKey(key);
+    if (n && n.options && typeof n.options.onTap == "function") {
+      n.options.onTap();
+    }
+  } catch (error) {
+    console.warn(error.message);
+  }
+});
+e.addListener("on_notification_dismiss", d => {
+  try {
+    const { key } = d;
+    console.log("on_notification_dmiss: fired for>", d);
+    const n = findNotificationByKey(key);
+
+    if (n && n.options && typeof n.options.onDismiss == "function") {
+      console.log("on_notification_dmiss: fire dismiss callback");
+
+      n.options.onDismiss();
+    } else {
+      console.log("on_notification_dmiss: cant fire dismiss callback>", n);
+    }
+  } catch (error) {
+    console.warn(error.message);
   }
 });
 const defaultOptions = Object.freeze({
   duration: 3,
-  backgroundColor: "#00FF00",
-  onTap: null
+  backgroundColor: "#000000",
+  onTap: null,
+  onDismiss: null
 });
-const showNotification = async (
-  title,
-  subtitle = "",
-  options = defaultOptions
-) => {
+const showNotification = async (title, subtitle = "", options) => {
   const key = makeGuid();
   if (typeof options !== "object") {
     console.warn(
       "showNotification: third argument must be an object. Valid keys: ",
       JSON.stringify(Object.keys(defaultOptions))
     );
-    options = defaultOptions;
+    options = {};
   }
+  options = Object.assign({}, defaultOptions, options);
   pendingNotifications.push({
     key,
     title,
