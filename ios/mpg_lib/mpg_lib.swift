@@ -31,10 +31,6 @@ class mpg_lib: RCTEventEmitter {
     ) -> Void {
         
         let backgroundColor:UIColor = self.hexStringToUIColor(hex: hexBackgroundColor);
-        
-        
-
-
         DispatchQueue.main.async {
             if let notification = MPGNotification(title: title, subtitle: subtitle, backgroundColor:backgroundColor, iconImage: nil) {
                 notification.duration = duration;
@@ -51,7 +47,7 @@ class mpg_lib: RCTEventEmitter {
                     success(["notification_dismissed"]);
                 }
             } else {
-                reject(nil,nil,nil);
+                reject("failed_notification_instantiation","Failed to create MPGNotification object",nil);
             }
         }
     }
