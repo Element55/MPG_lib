@@ -27,15 +27,20 @@ class mpg_lib: RCTEventEmitter {
             alpha: CGFloat(1.0)
         )
     }
-    @objc func showNotification(_ key: String, title: String, subtitle: String,  hexBackgroundColor: String, duration: Double, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
+    @objc func showNotification(_ key: String, title: String, subtitle: String,  hexBackgroundColor: String, duration: Double, hexTitleColor: String, hexSubtitleColor: String, allowTapDismissal: Bool, success: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
         
         let backgroundColor:UIColor = self.hexStringToUIColor(hex: hexBackgroundColor);
+        let titleColor: UIColor = self.hexStringToUIColor(hex: hexTitleColor);
+        let subtitleColor: UIColor = self.hexStringToUIColor(hex: hexSubtitleColor)
         DispatchQueue.main.async {
             if let notification = MPGNotification(title: title, subtitle: subtitle, backgroundColor:backgroundColor, iconImage: nil) {
                 notification.duration = duration;
-                notification.backgroundTapsEnabled = true;
+                notification.backgroundTapsEnabled = allowTapDismissal;
                 notification.animationType = .linear;
+                notification.titleColor = titleColor;
+                notification.subtitleColor = subtitleColor;
+                
                 notification.show(buttonHandler: { (mpgnotification, buttonIndex) in
                     let body = [
                         "key": key,
